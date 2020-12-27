@@ -1,0 +1,633 @@
+---
+author: "Yanki Saplan"
+date: "December 8, 2020"
+title: "Song Project Stat 184"
+output: html_notebook
+---
+#load the packages that is required within this project
+```{r}
+library(rvest)
+library(tidyverse)
+library(genius)
+library(tidytext)
+library(gridExtra)
+library(ggplot2)
+library(regexPipes)
+library(dplyr)
+data("stop_words")
+data("sentiments")
+```
+
+#read the data from wikipedia, create a path for the link, and tables store them, print out the uncleaned the data table.
+
+```{r}
+# read webpage for Grammy Awards
+webpage <- read_html("https://en.wikipedia.org/wiki/Grammy_Award_for_Record_of_the_Year")
+
+# copy xpath for table of 1980s
+XPATH80 <- '/html/body/div[3]/div[3]/div[5]/div[1]/table[5]'
+
+# run the following to create table of songs from 1980s
+table_1980 <- 
+  webpage %>%
+  html_nodes(xpath = XPATH80) %>%
+  html_table(fill = TRUE)
+
+d1980 <- table_1980[[1]]
+head(d1980)
+```
+#cleaning the data table and renaming it to ROY80s by calling table d1980, renaming old column names to new names, get rid of empty NA values, lastly get rid of any brackets present inside the table for the purpose of cleaning. Insert lyrics by genius function to each ROY
+```{r}
+#change the table name to ROY80s
+ROY80s <- d1980
+#changing the column names 
+  ROY80s <-
+  ROY80s %>%
+  select(`Year[I]`, Record, `Artist(s)`) %>%
+  rename(year = `Year[I]`,
+        track = Record,
+        artist = `Artist(s)`)
+#remove na s from the table
+  ROY80s <-
+  ROY80s %>%
+  na.omit()
+#Remove the brackets, from the [1] Year column
+  ROY80s <-
+  ROY80s %>%
+  mutate(year = trimws(str_replace(year, "\\[.*?\\]","")))
+  
+#get the lyrics for the songs listed under 1980s
+  lyrics80s <- ROY80s %>%
+    add_genius(artist, track, type = "lyrics")
+head(ROY80s)
+```
+
+
+```{r}
+# read webpage for Grammy Awards
+webpage <- read_html("https://en.wikipedia.org/wiki/Grammy_Award_for_Record_of_the_Year")
+
+# copy xpath for table of 1990s
+XPATH90 <- '/html/body/div[3]/div[3]/div[5]/div[1]/table[6]'
+
+# run the following to create table of songs from 1990s
+table_1990 <- 
+  webpage %>%
+  html_nodes(xpath = XPATH90) %>%
+  html_table(fill = TRUE)
+
+d1990 <- table_1990[[1]]
+head(d1990)
+```
+```{r}
+#change the table name to ROY90s
+ROY90s <- d1990
+#changing the column names 
+  ROY90s <-
+  ROY90s %>%
+  select(`Year[I]`, Record, `Artist(s)`) %>%
+  rename(year = `Year[I]`,
+        track = Record,
+        artist = `Artist(s)`)
+#remove na s from the table
+  ROY90s <-
+  ROY90s %>%
+  na.omit()
+#Remove the brackets, from the [1] Year column
+  ROY90s <-
+  ROY90s %>%
+  mutate(year = trimws(str_replace(year, "\\[.*?\\]","")))
+  
+#get the lyrics for the songs listed under 1990s
+  lyrics90s <- ROY90s %>%
+    add_genius(artist, track, type = "lyrics")
+head(ROY90s)
+```
+
+```{r}
+# read webpage for Grammy Awards
+webpage <- read_html("https://en.wikipedia.org/wiki/Grammy_Award_for_Record_of_the_Year")
+
+# copy xpath for table of 2000s
+XPATH00 <- '/html/body/div[3]/div[3]/div[5]/div[1]/table[7]'
+
+# run the following to create table of songs from 2000s
+table_2000 <- 
+  webpage %>%
+  html_nodes(xpath = XPATH00) %>%
+  html_table(fill = TRUE)
+
+d2000 <- table_2000[[1]]
+head(d2000)
+```
+```{r}
+#change the table name to ROY00s
+ROY00s <- d2000
+#changing the column names 
+ROY00s <-
+  ROY00s %>%
+  select(`Year[I]`, Record, `Artist(s)`) %>%
+  rename(year = `Year[I]`,
+        track = Record,
+        artist = `Artist(s)`)
+#remove na s from the table
+  ROY00s <-
+  ROY00s %>%
+  na.omit()
+#Remove the brackets, from the [1] Year column
+  ROY00s <-
+  ROY00s %>%
+  mutate(year = trimws(str_replace(year, "\\[.*?\\]","")))
+  
+#get the lyrics for the songs listed under 2000s
+  lyrics00s <- ROY00s %>%
+    add_genius(artist, track, type = "lyrics")
+head(ROY00s)
+```
+
+```{r}
+# read webpage for Grammy Awards
+webpage <- read_html("https://en.wikipedia.org/wiki/Grammy_Award_for_Record_of_the_Year")
+
+# copy xpath for table of 2010s
+XPATH12 <- '/html/body/div[3]/div[3]/div[5]/div[1]/table[8]'
+
+
+# run the following to create table of songs from 2010s
+table_2010 <- 
+  webpage %>%
+  html_nodes(xpath = XPATH12) %>%
+  html_table(fill = TRUE) 
+  
+
+d2010 <- table_2010[[1]]
+head(d2010)
+```
+
+
+```{r}
+#change the table name to ROY10s
+ROY10s <- d2010
+#changing the column names 
+  ROY10s <-
+  ROY10s %>%
+  select(`Year[I]`, Record, `Artist(s)`) %>%
+  rename(year = `Year[I]`,
+        track = Record,
+        artist = `Artist(s)`)
+#remove na s from the table
+  ROY10s <-
+  ROY10s %>%
+  na.omit()
+#Remove the brackets, from the [1] Year column
+  ROY10s <-
+  ROY10s %>%
+  mutate(year = trimws(str_replace(year, "\\[.*\\]","")))
+  
+#get the lyrics for the songs listed under 2010s
+  lyrics10s <- ROY10s %>%
+    add_genius(artist, track, type = "lyrics")
+head(ROY10s)
+```
+#Binding all the lyrics varibles who has genius in them,(also cleaned) to a new variable called new1
+```{r}
+new1 <- rbind(lyrics80s, lyrics90s, lyrics00s, lyrics10s)
+```
+#merge it to a variable called lyric4
+```{r}
+lyrics4 <- new1 
+```
+#unnest tokens inside the lyric4
+```{r}
+lyrics4 <- lyrics4 %>%
+  unnest_tokens(word, lyric)
+```
+
+```{r}
+lyrics4 <- lyrics4%>% 
+  group_by(track, decade) %>%
+  summarise(count = sum(n()))
+```
+#ifelse did not work some reason, use case_when instead when each year ranges fall into the designated categories rename them for the sake of decade
+```{r}
+lyrics4 <- lyrics4 %>% 
+  rowwise() %>%
+  mutate(decade = case_when( year %in% 1980:1989 ~ "1980s",
+                             year %in% 1990:1999 ~ "1990s",
+                             year %in% 2000:2009 ~ "2000s",
+                             year %in% 2010:2019 ~ "2010s"))
+# function worked after trying it with case_when, although it doesnt output now because the graph is already made and year is not present inside lyrics3 anymore
+```
+#plot the graph using ggplot and get rid of legend position, print out the result, by naming x = words per song, y = decade. The graph uses boxplot, shows any outliers present for the specific decade, since we have counted our data inside summarise function y values are per decade total.
+```{r}
+#graph of first box plot
+lyrics4 %>%
+    ggplot(aes(x = decade, y = count, fill=decade)) +
+    geom_boxplot() +
+    theme(legend.position = "None")+
+    xlab("Decade")+
+    ylab("Words per Song")+
+    ggtitle("Boxplots of Words per Grammy Nominated Song by Decade")
+```
+#graph above prints out boxplots that represents the words per grammy nominated songs by using the decade variable we have integrated within our code. And compares each decade by using words per song tag.
+
+#creating a new data frame to store words used by artists, later on this frame will be used to antijoin from the main data
+```{r}
+data_stopwords <-data.frame(word = c("ba", "du", "yeah", "da", "ya", "ooh", "gonna", "na", "uh", "la", "hol"))
+```
+#bind lyrics into a new variable
+```{r}
+NewGraph <- rbind(lyrics80s, lyrics90s, lyrics00s, lyrics10s)
+NewGraph <-
+  NewGraph %>%
+  unnest_tokens(word, lyric)
+```
+#anti joining stop words and data stop words from the new graph
+```{r}
+NewGraph <-
+  NewGraph %>%
+  anti_join(data_stopwords, by = c("word"="word")) %>%
+  anti_join(stop_words, by = c("word"="word")) 
+```
+#filtering for the graph visualization
+
+```{r}
+NewGraph <-
+  NewGraph %>%
+  count(word, sort = TRUE)%>%
+  filter(n >= 3)%>%
+  top_n(10)
+```
+#After running the codes needed for our second graph, we count and sort the words inside our graphing variable(NewGraph), we use antijoin function to get rid of the stopwords and data stopwords that we defined above. We order each word by word for the x axis, get rid of the legend, and fill them by color of our choice.
+```{r}
+NewGraph%>%
+  ggplot(aes(x = reorder(word, -n), y =n))+
+  geom_col(stat = 'identity', color = 'blue', fill = 'blue')+
+  xlab("word")+
+  ylab("count")+
+  theme(legend.position = "none")+
+  ggtitle("Ten Most Popular Words Of Grammy Nominated Songs from 1980 and 2019")
+```
+#the graph above represents the difference of each word that is being used artists across our data table, we count and filter all the top ten words and graph them with our count and word variables, to demonstrate the understanding of which words were used the most during these decades.
+
+
+
+```{r}
+# create data frame of top 10 words
+# occur at least 3 times
+# remove common words using stop_word list in tidytext package
+# plot 
+# using count from tidytext package
+#ft <- verse_words %>%
+  anti_join(stop_words)
+
+NewGraph <- ft %>%
+  count(word, sort = TRUE) %>%
+  filter(n >= 3) %>%
+  #filter(word != 'em') %>% #Review topten and filter words missed by stop_words
+  top_n(10)
+
+#topyear <- ft %>% #NOTE that this data frame results in THREE variables not TWO!!
+  #group_by(year) %>%
+  #count(word, sort = TRUE) %>%
+  #filter(n >= 3) %>%
+  #filter(word != 'em') %>% #Review topten and filter words missed by stop_words
+  #top_n(10)
+```
+#Code chunks below are for Graph 3 Implementation
+
+```{r}
+Graph3first <- lyrics80s
+```
+# carry the lyrics by each decade inside to first graphing variable starting by 1980s, this procedure has done to each decade. The purpose of this is to classify each decades graphing variable, so when we graph them, we have 2 columns by 2 rows for each decade.
+```{r}
+Graph3first <-
+  Graph3first %>%
+  unnest_tokens(word, lyric)
+```
+
+```{r}
+Graph3first <-
+  Graph3first %>%
+  anti_join(data_stopwords, by = c("word"="word")) %>%
+  anti_join(stop_words, by = c("word" = "word")) %>%
+  mutate(
+    decade = case_when( year %in% 1980:1989 ~ "1980s")
+  )
+```
+
+```{r}
+Graph3first <- Graph3first %>%
+  group_by(year, decade) %>%
+  count(word, sort = TRUE) %>%
+  filter( n >= 3) %>%
+  ungroup() %>%
+  top_n(10)
+```
+
+```{r}
+Graph3sec <- lyrics90s
+```
+
+```{r}
+Graph3sec <-
+  Graph3sec %>%
+  unnest_tokens(word, lyric)
+```
+
+```{r}
+Graph3sec <-
+  Graph3sec %>%
+  anti_join(data_stopwords, by = c("word"="word")) %>%
+  anti_join(stop_words, by = c("word" = "word")) %>%
+  mutate(
+    decade = case_when( year %in% 1990:1999 ~ "1990s")
+  )
+```
+
+```{r}
+Graph3sec <- Graph3sec %>%
+  group_by(year, decade) %>%
+  count(word, sort = TRUE) %>%
+  filter( n >= 3) %>%
+  ungroup() %>%
+  top_n(10)
+```
+
+```{r}
+Graph3third <- lyrics00s
+```
+
+```{r}
+Graph3third <-
+  Graph3third %>%
+  unnest_tokens(word, lyric)
+```
+
+```{r}
+Graph3third <-
+  Graph3third %>%
+  anti_join(data_stopwords, by = c("word"="word")) %>%
+  anti_join(stop_words, by = c("word" = "word")) %>%
+  mutate(
+    decade = case_when( year %in% 2000:2009 ~ "2000s")
+  )
+```
+
+```{r}
+Graph3third <- Graph3third %>%
+  group_by(year, decade) %>%
+  count(word, sort = TRUE) %>%
+  filter( n >= 3) %>%
+  ungroup() %>%
+  top_n(10)
+```
+
+```{r}
+Graph3fourth <- lyrics10s
+```
+
+```{r}
+Graph3fourth <-
+  Graph3fourth %>%
+  unnest_tokens(word, lyric)
+```
+
+```{r}
+Graph3fourth <-
+  Graph3fourth %>%
+  anti_join(data_stopwords, by = c("word"="word")) %>%
+  anti_join(stop_words, by = c("word" = "word")) %>%
+  mutate(
+    decade = case_when( year %in% 2010:2019 ~ "2010s")
+  )
+```
+
+```{r}
+Graph3fourth <- Graph3fourth %>%
+  group_by(year, decade) %>%
+  count(word, sort = TRUE) %>%
+  filter( n >= 3) %>%
+  ungroup() %>%
+  top_n(10)
+```
+
+#merging all the data we created above for graphing 3
+
+```{r}
+mygraph1 <-Graph3first %>%
+  ggplot(aes(x = reorder(word, -n), y = n)) +
+  geom_bar(stat = 'identity', color = 'black', fill = 'black')+
+  theme_minimal() +
+  ggtitle("1980s")+
+  xlab("Word")+
+  ylab("Count")+
+  theme(legend.position = "none")
+```
+#creating each decades graphing variable and putting our graph variables inside the ggplot for each decade
+```{r}
+mygraph2 <-Graph3sec %>%
+  ggplot(aes(x = reorder(word, -n), y = n)) +
+  geom_bar(stat = 'identity', color = 'green', fill = 'green')+
+  theme_minimal() +
+  ggtitle("1990s")+
+  xlab("Word")+
+  ylab("Count")+
+  theme(legend.position = "none")
+```
+
+```{r}
+mygraph3 <-Graph3third %>%
+  ggplot(aes(x = reorder(word, -n), y = n)) +
+  geom_bar(stat = 'identity', color = 'red', fill = 'red')+
+  theme_minimal() +
+  ggtitle("2000s")+
+  xlab("Word")+
+  ylab("Count")+
+  theme(legend.position = "none")
+```
+
+```{r}
+mygraph4 <-Graph3fourth %>%
+  ggplot(aes(x = reorder(word, -n), y = n)) +
+  geom_bar(stat = 'identity', color = 'blue', fill = 'blue')+
+  theme_minimal() +
+  ggtitle("2010s")+
+  xlab("Word")+
+  ylab("Count")+
+  theme(legend.position = "none")
+```
+#The procedure of making this graph, included creating and carrying decade lyrics variables into a new variable, getting rid of the stop words and our data stop words, counting them by year and decade variables that are present inside the graph. Lastly mergin each decades cleaned variables into the graphing variables and specifying rows and columns we need to graph this in four different window method. 
+```{r}
+grid.arrange(mygraph1, mygraph2, mygraph3, mygraph4, nrow =2, ncol=2, top = "Top Ten Words by Decade")
+```
+#The purpose of this graph is to understand and implement each decade seperate from each other, by doing this we can read each row and column much cleaner. By using each decades tables, we use count variable to understand which top ten words were used the most per decade, and count the maximum and remaining amounts.
+
+#Implementation of Graph4
+```{r}
+Graphic4 <- rbind(lyrics80s, lyrics90s, lyrics00s, lyrics10s)
+```
+#Rename the sentiment values negative, postive into 1s and 0s 
+```{r}
+sentiments <-
+  sentiments %>%
+  mutate(truthvalue = case_when( sentiment %in% "negative" ~ "0",
+                                 sentiment %in% "positive" ~ "1"))
+```
+#after error we have to specify year column is numeric
+```{r}
+Graphic4$year <- as.numeric(as.character(Graphic4$year))
+```
+
+```{r}
+Graphic4 <-
+  Graphic4 %>%
+  count(truthvalue)
+```
+#count new column name data
+```{r}
+Graphic4 <-
+  Graphic4 %>%
+  anti_join(data_stopwords, by = c("word"="word")) %>%
+  anti_join(stop_words, by = c("word"="word")) %>%
+  mutate(decade = case_when( year %in% 1980:1989 ~ "1980s",
+                             year %in% 1990:1999 ~ "1990s",
+                             year %in% 2000:2009 ~ "2000s",
+                             year %in% 2010:2019 ~ "2010s"))%>%
+  inner_join(sentiments, by = "word") %>%
+  group_by(year, decade, sentiment, truthvalue)
+```
+#specifying the decades using case_when
+```{r}
+Graphic4 <-
+  Graphic4 %>%
+  filter(truthvalue ==1)
+```
+# if we don't filter it out the graph does not look the same as the example
+
+#The procedure that went into this graph consists of binding all the lyrics tables into our graphing variable, later on specifying the year column is a numeric non string value. Secondly, creating a new column called truth value, and most importantly using a case_when function to change positive values into 1s and negative values into 0s.
+```{r}
+Graphic4 %>%
+  ggplot(aes(x=year, y=n))+
+  aes(fill = decade)+
+  ggtitle("Net Sentiment Score by Year")+
+  geom_bar(stat = 'identity')+
+  scale_x_continuous(breaks = seq(from =1980, to =2020, by =10))+
+  xlab("Year")+
+  ylab("Net Sentiment")+
+  theme_minimal()
+```
+# The purpose of this graph is to count the net sentiment scores after renaming the positive values into 1s and negative values into 0s. After, counting each years net sentiment scores per decade, we can come to a conclusion to compare decades with other decades, and also we can compare years inside the decade and come to a conclusion if positive words were used more than negative words.
+#Graph 5 Implementation 
+```{r}
+Graph5 <- rbind(lyrics80s, lyrics90s, lyrics00s, lyrics10s)
+```
+#Bind all lyrics into our graph5 variable
+```{r}
+Graph5$year <- as.numeric(as.character(Graph5$year))
+```
+# we have to specify year as a numeric non string value
+```{r}
+Graph5 <-
+  Graph5 %>%
+  unnest_tokens(word, lyric)
+```
+# unnest the tokens
+```{r}
+Graph5 <-
+  Graph5 %>%
+  group_by(decade) %>%
+  summarise_at(vars(-sentiment, truthvalue), funs(mean(., na.rm = TRUE)))
+```
+#group the variables by decade variable, -sentiment orders the sentiment column, no empty values, and take the mean of truthvalue scores
+
+```{r}
+Graph5 <-
+  Graph5 %>%
+  anti_join(data_stopwords, by = c("word"="word")) %>%
+  anti_join(stop_words, by = c("word"="word")) %>%
+  mutate(decade = case_when( year %in% 1980:1989 ~ "1980s",
+                             year %in% 1990:1999 ~ "1990s",
+                             year %in% 2000:2009 ~ "2000s",
+                             year %in% 2010:2019 ~ "2010s"))%>%
+  inner_join(sentiments, by = "word") %>%
+  group_by(year, decade, sentiment, truthvalue)
+```
+#specifying the decades using case_when
+```{r}
+Graph5 <-
+  Graph5 %>%
+  count(truthvalue)
+```
+#filtering truthvalues where its positive
+```{r}
+Graph5 <-
+  Graph5 %>%
+  filter(truthvalue ==1)
+```
+#the procedure for this graph is very similar to graph 4 instead we take the average per decade instead of graphing them year by year inside the decades. By filtering out the positive values (the values that can only increase the sentiment score) we take their mean per decade to compare with other decades. 
+```{r}
+Graph5 %>%
+  ggplot(aes(x = decade, y=n))+
+  aes((fill = decade))+
+  ggtitle("Net Sentiment Score by Year")+
+  geom_bar(stat = 'identity')+
+  xlab("Year")+
+  ylab("Mean Sentiment Score")+
+  theme_minimal()+
+  theme(legend.position = "none")
+```
+#the purpose of graph 6 versus graph 5 is to compare decades by each other since we took their means. It is harder to understand the mean in graph5  where inside each decade we see years seperately, using the mean function and merging years inside the decade varibale via plotting them makes it easier for us to compare net sentiment score by year.
+
+#Implementation of Graph 6 
+
+```{r}
+Graph6 <- rbind(lyrics80s, lyrics90s, lyrics00s, lyrics10s)
+```
+
+```{r}
+Graph6$year <- as.numeric(as.character(Graph6$year))
+```
+
+```{r}
+Graph6 <-
+  Graph6 %>%
+  unnest_tokens(word, lyric)
+```
+
+```{r}
+Graph6 <-
+  Graph6 %>%
+  anti_join(data_stopwords, by = c("word"="word")) %>%
+  anti_join(stop_words, by = c("word"="word")) %>%
+  mutate(decade = case_when( year %in% 1980:1989 ~ "1980s",
+                             year %in% 1990:1999 ~ "1990s",
+                             year %in% 2000:2009 ~ "2000s",
+                             year %in% 2010:2019 ~ "2010s"))%>%
+  inner_join(sentiments, by = "word") %>%
+  group_by(year, decade, sentiment, truthvalue)
+```
+
+```{r}
+Graph6 %>%
+  ggplot(aes(x = decade, y=n))+
+  aes((fill = decade))+
+  ggtitle("Net Sentiment Score by Year of Grammy Nominated Records from 1980 - 2019")+
+  geom_line(stat = 'identity')+
+  geom_smooth()+
+  xlab("Year")+
+  ylab("Net Sentiment")+
+  theme_minimal()
+```
+#zoom recording link
+https://psu.zoom.us/rec/share/lQ91jvMinuHlKESrC4T8UJxdlnSV7vYoBAbzlVtc1MwywQB3qsg2l63iVqUcW0Mu.9zu47uRNlbZfUBu-
+
+
+
+
+
+
+
+
+
+
